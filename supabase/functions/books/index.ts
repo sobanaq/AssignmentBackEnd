@@ -39,6 +39,15 @@ serve(async (req: Request) => {
       if (error) throw error;
       return new Response(JSON.stringify({ success: true, message: "Message sent!" }), { headers });
     }
+        // Handle POST request - add user
+        if (req.method === "POST") {
+          const { author, title, ISBN } = await req.json();
+          const { error } = await supabase.from("books").insert([{ author, title, ISBN }]);
+          
+          if (error) throw error;
+          return new Response(JSON.stringify({ success: true, message: "Message sent!" }), { headers });
+        }
+    
 
     // Handle unsupported methods
     return new Response(JSON.stringify({ error: "Method not allowed" }), { 
@@ -55,4 +64,16 @@ serve(async (req: Request) => {
   }
 });
 
+CREATE TABLE public.profiles (
+  id bigint primary key generated always as identity,
+  user_id uuid references auth.users(id) on delete cascade,
+  username text,
+  bio text,
+  created_at timestamp with time zone default now()
+);
 
+//Enable Row Level Security
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+//Create an index on the user_id for better performance
+CREATE INDEX idx_profiles_user_id ON public.profiles(user_id);
