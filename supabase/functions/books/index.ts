@@ -20,7 +20,7 @@ serve(async (req: Request) => {
   const headers = { "Content-Type": "application/json" };
 
   try {
-    // Handle GET request - fetch messages
+    // Handle GET request - get books
     if (req.method === "GET") {
       const { data, error } = await supabase
         .from("books")
@@ -31,7 +31,18 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify(data), { headers });
     }
 
-    // Handle POST request - add message
+        // Handle DELETE request - delete book
+        if (req.method === "DELETE") {
+          const {id} = await req.json();
+          const { data, error } = await supabase
+            .from("books")
+            .delete()
+            .eq("id", id);
+          if (error) throw error;
+          return new Response(JSON.stringify(data), { headers });
+        }
+
+    // Handle POST request - add book
     if (req.method === "POST") {
       const { author, title, ISBN } = await req.json();
       const { error } = await supabase.from("books").insert([{ author, title, ISBN }]);
@@ -63,17 +74,3 @@ serve(async (req: Request) => {
     });
   }
 });
-
-CREATE TABLE public.profiles (
-  id bigint primary key generated always as identity,
-  user_id uuid references auth.users(id) on delete cascade,
-  username text,
-  bio text,
-  created_at timestamp with time zone default now()
-);
-
-//Enable Row Level Security
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-
-//Create an index on the user_id for better performance
-CREATE INDEX idx_profiles_user_id ON public.profiles(user_id);
