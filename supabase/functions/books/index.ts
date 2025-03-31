@@ -50,10 +50,10 @@ serve(async (req: Request) => {
       if (error) throw error;
       return new Response(JSON.stringify({ success: true, message: "Message sent!" }), { headers });
     }
-        // Handle POST request - add user
-        if (req.method === "POST") {
-          const { author, title, ISBN } = await req.json();
-          const { error } = await supabase.from("books").insert([{ author, title, ISBN }]);
+        // Handle PUT request - update book
+        if (req.method === "PUT") {
+          const { author, title, ISBN, id } = await req.json();
+          const { error } = await supabase.from("books").update([{ author, title, ISBN }]).eq('id', id);
           
           if (error) throw error;
           return new Response(JSON.stringify({ success: true, message: "Message sent!" }), { headers });
