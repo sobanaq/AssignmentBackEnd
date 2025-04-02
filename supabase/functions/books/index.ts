@@ -59,7 +59,6 @@ serve(async (req: Request) => {
     return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers });
 
   } catch (error) {
-    
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return new Response(JSON.stringify({ error: errorMessage }), { status: 500, headers });
   }
